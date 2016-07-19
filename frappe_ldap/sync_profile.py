@@ -81,4 +81,4 @@ def get_message(new_profiels):
 	return """ Hello Admin. \n
 			Profiles has been synced. \n
 			Please check the assigned roles to them. \n
-			List is as follws:\n %s """%'\n'.join(new_profiels)
+			List is as follows:\n %s """%'\n'.join(new_profiels)
