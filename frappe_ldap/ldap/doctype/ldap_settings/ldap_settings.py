@@ -19,9 +19,10 @@ def set_ldap_connection(server_details):
 		try:
 			if server_details.get('ldap_server'):
 				connect = ldap.initialize(server_details.get('ldap_server'))
+				connect.set_option(ldap.OPT_REFERRALS, 0)
 			else:
 				frappe.msgprint("Please setup server details", raise_exception=1)
 		except ldap.LDAPError, e:
-			frappe.msgprint("Connection Failed!!! Contact System Manager", raise_exception=1)
+			frappe.msgprint("Connection Filed!!! Contact System Manager", raise_exception=1)
 
 		return connect, user_dn, base_dn

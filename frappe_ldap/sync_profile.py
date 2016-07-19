@@ -25,7 +25,8 @@ def ldap_connect():
 	server_details = get_details()
 
 	connect, user_dn, base_dn = set_ldap_connection(server_details)
-	filters =  "uid=*"
+	filters =  server_details.get('ldap_uidmapping')+"=*"
+#	filters =  "uid=*"
 
 	new_created = []
 	enabled_profiles = []
@@ -36,7 +37,7 @@ def ldap_connect():
 	except :
 		connect.unbind_s()
 
-	#search for profiels
+	#search for users
 	result = connect.search_s(base_dn, 2,filters)
 
 	for dn, r in result:
@@ -51,7 +52,7 @@ def ldap_connect():
 
 def disable_profiles(enabled_profiles):
 	profiles = []
-	enabled_profiles.extend([x[0] for x in get_system_manger()])
+	enabled_profiles.extend([x[0] for x in get_system_manager()])
 
 	for pro in enabled_profiles:
 		profiles.append("'%s'"%pro)
@@ -64,7 +65,7 @@ def disable_profiles(enabled_profiles):
 	for pro in profile:
 		frappe.db.sql("update tabUser set enabled = 0 where name = '%s' and name not in ('Administrator','Guest')"%pro[0])
 
-def get_system_manger():
+def get_system_manager():
 	return frappe.db.sql("""select parent from tabUserRole
 		where role = 'System Manager'
 			and parent not in ('Administrator')""",as_list=1)

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import frappe
 import json
 import frappe.utils
+import pprint
 from frappe import _
 
 
@@ -32,23 +33,34 @@ def ldap_auth(user, pwd, server_details):
 	from frappe_ldap.ldap.doctype.ldap_settings.ldap_settings import set_ldap_connection
 	import ldap
 
+
 	status = True
 	mail = None
 	user_id = None
 	dn = None
 
+	#base_dn = server_details.get('base_dn')
+	ldap_filter = server_details.get('ldap_filter')
+        #pprint.pprint(ldap_filter)
+	ldap_uidmapping = server_details.get('ldap_uidmapping')
+
 	conn, user_dn, base_dn = set_ldap_connection(server_details)
-	filters = "uid=*"+user+"*"
+	if len(ldap_filter)>=1:
+		filters = ldap_filter.replace("%s", user)
+	else:
+		filters = ldap_uidmapping+"="+user
+
 	role = 'Default'
 	try:
 		# l = ldap.initialize('ldap://ldap.forumsys.com/')
-		conn.simple_bind_s(user_dn, pwd)
+		conn.simple_bind_s(user_dn, server_details.get('pwd'))
 		result = conn.search_s(base_dn, ldap.SCOPE_SUBTREE, filters)
 
 		for dn, r in result:
 			dn = str(dn)
 			mail = str(r['mail'][0])
-			user_id = str(r['uid'][0])
+#			user_id = str(r['uid'][0])
+                        user_id = str(ldap_uidmapping)
 			role = r.get('description') if r.get('description') else 'Default'
 		if dn:
 			conn.simple_bind_s(dn,pwd)
@@ -57,7 +69,7 @@ def ldap_auth(user, pwd, server_details):
 			frappe.msgprint("Not a valid LDAP user", raise_exception=1)
 	except ldap.LDAPError, e:
 		conn.unbind_s()
-		status = False
+		status = False		
 		frappe.msgprint("Incorrect UserId or Password", raise_exception=1)
 	return mail, user_id, status, role
 
@@ -94,7 +106,9 @@ def assign_role(user, user_id, role):
 
 def get_role_list(roles):
 	role_list = []
-	for role in roles.split(','):
+#	for role in roles.split(','):
+	for role in roles:
+		role.split(',')
 		role_list=frappe.db.sql("select role from `tabRole Mapper Details` where parent='%s'"%(role),as_list=1)
 	return role_list
 
@@ -106,4 +120,4 @@ def check_if_enabled(user):
 		frappe.msgprint('User disabled or missing',raise_exception=1)
 
 def get_details():
-	return frappe.db.get_value("LDAP Settings",None,['ldap_server','user_dn','base_dn','pwd'],as_dict=1)
+	return frappe.db.get_value("LDAP Settings",None,['ldap_server','user_dn','base_dn','pwd','ldap_filter','ldap_uidmapping'],as_dict=1)
