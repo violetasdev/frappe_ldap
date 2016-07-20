@@ -1,5 +1,5 @@
 {% extends "templates/web.html" %}
-{% block style %}{% include "templates/includes/login/login.css" %}{% endblock %}
+
 
 {% block content %}
 <div class="login-content container" style="max-width: 800px;">
@@ -76,6 +76,6 @@
 </div>
 {% endblock %}
 
-{% block script_lib %}{% include "templates/includes/login/login.js" %}{% endblock %}
-
-{% block sidebar %}{% endblock %}
+{% block script %}
+<script>{% include "templates/includes/login/login.js" %}</script>
+{% endblock %}
