@@ -6,7 +6,7 @@ Frappe LDAP app opens new wing of login. This app enables login with ldap creden
 - frappe (To install: [bench page](https://github.com/frappe/bench) )
 - python module, python-ldap
 	To install python-ldap on ubuntu based system, use pip install python-ldap. <br>You may encounter dependency issue, to resolve these dependencies issue use <br> sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev 
-- If you are using Centos7 , install openLdap
+- If you are using Centos7 , install  openldap-devel
  
 ###Installation
 
